@@ -37,6 +37,7 @@ app.use(morgan('dev'));
 // });
 
 
+
 //Routes
 app.get('/', (req, res) => {res.redirect('/blogs');});
 app.use('/blogs',blogsRoutes);

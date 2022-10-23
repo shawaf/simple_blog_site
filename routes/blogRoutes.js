@@ -1,78 +1,19 @@
 const express = require('express');
-const Blog = require('../models/blog');
 const router = express.Router();
+const blogController = require('../controllers/blogController');
 
 //Get Blogs content from DB
-router.get('/', (req, res) => {
-    Blog.find().sort({ createdAt: -1 })
-        .then((result) => {
-            res.render('index', { title: 'All Blogs', blogs: result });
-        })
-        .catch((err) => { console.log(err); })
-});
-
-router.post('/', (req, res) => {
-    const blog = new Blog(req.body);
-
-    blog.save()
-        .then((result) => {
-            console.log(result);
-            res.redirect('/blogs');
-        }).catch((err) => { console.log(err); })
-});
-
-router.get('/create', (req, res) => {
-    res.render('create', { title: 'New Blog' });
-});
-
-router.get('/:id', (req, res) => {
-    const id = req.params.id;
-    Blog.findById(id)
-        .then(result => {
-            res.render('details', { title: "Blog Details", blog: result });
-        })
-        .catch(err => {
-            console.log(err);
-        });
-});
-
-router.delete('/:id', (req, res) => {
-    const id = req.params.id;
-    Blog.findByIdAndDelete(id)
-        .then(result => {
-            res.json({ redirect: '/blogs' });
-        })
-        .catch(err => {
-            console.log(err);
-        });
-})
-
-//Save
-router.get('/add-blog', (req, res) => {
-    const blog = new Blog({
-        title: 'New Blog2 ',
-        snippet: 'This is the snippet of the new blog2',
-        body: 'This is the body of the blog2'
-    });
-    blog.save()
-        .then((result) => {
-            res.send(result);
-        })
-        .catch((err) => { console.log(err); });
-});
-
+router.get('/', blogController.blog_index_sorted);
+router.post('/',blogController.blog_create_post );
+router.get('/create', blogController.blog_create_get);
+router.get('/:id', blogController.blog_details);
+router.delete('/:id', blogController.blog_delete);
+//Save with fixed data
+router.get('/add-blog', blogController.blog_save_fixed);
 //View all blogs from DB
-router.get('/all-blogs', (req, res) => {
-    Blog.find()
-        .then((result) => { res.send(result); })
-        .catch((err) => { console.log(err); })
-});
+router.get('/all-blogs', blogController.blog_index_notsorted);
 
-router.get('/single-blog', (req, res) => {
-    Blog.findById('63508e8469412f2bc8d1eeb8')
-        .then((result) => { res.send(result); })
-        .catch((err) => { console.log(err); })
-});
+router.get('/single-blog', blogController.blog_single_fixed);
 
 
-module.exports = router;
+module.exports = router; 
